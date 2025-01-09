@@ -129,9 +129,11 @@ public class RobotContainer
   private void configureBindings()
   {
     // (Condition) ? Return-On-True : Return-on-False
-    drivebase.setDefaultCommand(!RobotBase.isSimulation() ?
+    /* Commented out below 3 lines and a line after based on recommendataion from forum */
+    /*drivebase.setDefaultCommand(!RobotBase.isSimulation() ?
                                 driveFieldOrientedDirectAngle :
-                                driveFieldOrientedDirectAngleSim);
+                                driveFieldOrientedDirectAngleSim);*/
+    drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
 
     if (Robot.isSimulation())
     {
