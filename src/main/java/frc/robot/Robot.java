@@ -133,6 +133,7 @@ public class Robot extends TimedRobot
     {
       CommandScheduler.getInstance().cancelAll();
     }
+    /*Below line can be commented out  based on feedback */
     m_robotContainer.setDriveMode();
   }
 
