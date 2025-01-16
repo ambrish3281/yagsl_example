@@ -433,6 +433,7 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @return SysId Drive Command
    */
+  /* Commenting out below as per feedback from yagsl as it throws build error. 
   public Command sysIdDriveMotorCommand()
   {
     return SwerveDriveTest.generateSysIdCommand(
@@ -440,7 +441,7 @@ public class SwerveSubsystem extends SubsystemBase
             new Config(),
             this, swerveDrive, 12),
         3.0, 5.0, 3.0);
-  }
+  } */
 
   /**
    * Command to characterize the robot angle motors using SysId

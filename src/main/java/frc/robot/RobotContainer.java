@@ -149,8 +149,8 @@ public class RobotContainer
     if (DriverStation.isTest())
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-
-      driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());
+      /*commented out below as that function is commented out in swervesubsystems.java */
+      /*driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());*/
       driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
