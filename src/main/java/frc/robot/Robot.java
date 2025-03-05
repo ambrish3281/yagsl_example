@@ -66,6 +66,7 @@ public class Robot extends TimedRobot
   public void robotInit()
   {
     // Setup CAN ID 9 for the Intake Motor Test
+    //AM Comment test. We need to update deviceId from 13 onwards
     motor_elevator_one = new SparkMax(9, MotorType.kBrushless); // SparkMax is flashed to CAN id 9
     motor_elevator_two = new SparkMax(11, MotorType.kBrushless); // SparkMax is flashed to CAN id
     SparkMaxConfig config_ = new SparkMaxConfig();
