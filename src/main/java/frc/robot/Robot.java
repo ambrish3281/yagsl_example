@@ -5,11 +5,24 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj.TimedRobot;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.Joystick;
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
  * described in the TimedRobot documentation. If you change the name of this class or the package after creating this
@@ -24,6 +37,15 @@ public class Robot extends TimedRobot
   private RobotContainer m_robotContainer;
 
   private Timer disabledTimer;
+
+  // Setup the variables
+  private SparkMax motor_intake_one;
+  private SparkMax motor_intake_two;
+  private SparkMax motor_intake_three;
+  private SparkMax motor_elevator_one;
+  private SparkMax motor_elevator_two;
+  private XboxController operator_controller;
+  private Joystick new_joystick;
 
   /* We can add     enableLiveWindowInTest(true);
  to see live data in Smartboard Ambrish */
@@ -43,6 +65,24 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+    // Setup CAN ID 9 for the Intake Motor Test
+    motor_elevator_one = new SparkMax(9, MotorType.kBrushless); // SparkMax is flashed to CAN id 9
+    motor_elevator_two = new SparkMax(11, MotorType.kBrushless); // SparkMax is flashed to CAN id
+    SparkMaxConfig config_ = new SparkMaxConfig();
+
+    config_.idleMode(SparkBaseConfig.IdleMode.kCoast);
+    motor_elevator_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    motor_elevator_two.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+
+      //motor_elevator_two.setid
+    // Operator Controller Port
+    operator_controller = new XboxController(1);
+
+    // Left Hand Joystick Port
+    new_joystick = new Joystick(1);
+
+    // XboxController exampleController = new XboxController(0); // Creates an XboxController on port 2.
+    // Trigger yButton = new JoystickButton(exampleController, XboxController.Button.kLeftBumper.value); // Creates a new JoystickButton object for the `Y` button on exampleController
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -122,9 +162,13 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit()
   {
+    // motor_elevator_one.set(0.1);
+    //motor_intake_one.set(controller.getY(Hand.kLeft));
+    // motor_intake_one.set(controller.getY(XboxController.Button.kA));
+  
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
+    // continue until interrupted by another command, rehmove
     // this line or comment it out.
     if (m_autonomousCommand != null)
     {
@@ -143,6 +187,17 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic()
   {
+    // Get the controller Y Axis for the Motor, and set it's motion to that
+    // motor_intake_one.set(new_joystick.getY());
+
+    // Set to RawAxis (CAN FIND ON DRIVER STATION #)
+    double rawaxis1 = operator_controller.getRawAxis(1)  ; 
+    System.out.println(rawaxis1);
+
+    motor_elevator_one.set(-rawaxis1);
+    motor_elevator_two.set(rawaxis1);
+
+    // motor_elevator_two.set(operator_controller.getRawAxis(1));
   }
 
   @Override
