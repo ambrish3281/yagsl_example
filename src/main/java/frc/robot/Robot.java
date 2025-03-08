@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -18,11 +19,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.Joystick;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
  * described in the TimedRobot documentation. If you change the name of this class or the package after creating this
@@ -46,6 +49,7 @@ public class Robot extends TimedRobot
   private SparkMax motor_elevator_two;
   private XboxController operator_controller;
   private Joystick new_joystick;
+  //private DigitalInput intakesensor;
 
   /* We can add     enableLiveWindowInTest(true);
  to see live data in Smartboard Ambrish */
@@ -67,20 +71,27 @@ public class Robot extends TimedRobot
   {
     // Setup CAN ID 9 for the Intake Motor Test
     //AM Comment test. We need to update deviceId from 13 onwards
-    motor_elevator_one = new SparkMax(9, MotorType.kBrushless); // SparkMax is flashed to CAN id 9
-    motor_elevator_two = new SparkMax(11, MotorType.kBrushless); // SparkMax is flashed to CAN id
+    motor_elevator_one = new SparkMax(21, MotorType.kBrushless); // SparkMax is flashed to CAN id 9
+    motor_elevator_two = new SparkMax(22, MotorType.kBrushless); // SparkMax is flashed to CAN id
+    motor_intake_one = new SparkMax(23, MotorType.kBrushless);
+    //DigitalInput intakesensor = new DigitalInput(1);
+
     SparkMaxConfig config_ = new SparkMaxConfig();
 
-    config_.idleMode(SparkBaseConfig.IdleMode.kCoast);
+    //config_.idleMode(SparkBaseConfig.IdleMode.kCoast);
+    //config_.smartCurrentLimit(40);
+    config_.openLoopRampRate(0.2);
+    //config_.idleMode(IdleMode.kBrake);
+    
     motor_elevator_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
     motor_elevator_two.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-
+    //motor_intake_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
       //motor_elevator_two.setid
     // Operator Controller Port
     operator_controller = new XboxController(1);
 
     // Left Hand Joystick Port
-    new_joystick = new Joystick(1);
+    // new_joystick = new Joystick(1);
 
     // XboxController exampleController = new XboxController(0); // Creates an XboxController on port 2.
     // Trigger yButton = new JoystickButton(exampleController, XboxController.Button.kLeftBumper.value); // Creates a new JoystickButton object for the `Y` button on exampleController
@@ -192,11 +203,24 @@ public class Robot extends TimedRobot
     // motor_intake_one.set(new_joystick.getY());
 
     // Set to RawAxis (CAN FIND ON DRIVER STATION #)
-    double rawaxis1 = operator_controller.getRawAxis(1)  ; 
-    System.out.println(rawaxis1);
+    double rawaxis1 = operator_controller.getRawAxis(1);
+    // rawaxis1 = 0.2;
+    //double ravaxis5 = operator_controller.getRawAxis(5); 
+    
+    
+    //System.out.println("JOystick rawxis : " + rawaxis1 + " : sensor value : " + intakesensor.get() );
 
-    motor_elevator_one.set(-rawaxis1);
-    motor_elevator_two.set(rawaxis1);
+    System.out.println("JOystick rawxis : " + rawaxis1);
+
+
+    //motor_elevator_one.setVoltage(6);
+    //motor_elevator_two.setVoltage(-6);
+    motor_elevator_one.set(rawaxis1);
+    motor_elevator_two.set(-rawaxis1);
+    //motor_elevator_two.set(rawaxis1);
+    //motor_elevator_one.set(-rawaxis1);
+
+    //motor_intake_one.set(ravaxis5);
 
     // motor_elevator_two.set(operator_controller.getRawAxis(1));
   }
