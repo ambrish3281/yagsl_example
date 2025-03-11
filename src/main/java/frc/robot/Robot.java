@@ -20,6 +20,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import javax.lang.model.util.ElementScanner14;
+
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -49,7 +52,9 @@ public class Robot extends TimedRobot
   private SparkMax motor_elevator_two;
   private XboxController operator_controller;
   private Joystick new_joystick;
-  //private DigitalInput intakesensor;
+  private DigitalInput intakesensor;
+  private SparkMax motor_arm;
+  private SparkMax motor_algae;
 
   /* We can add     enableLiveWindowInTest(true);
  to see live data in Smartboard Ambrish */
@@ -71,22 +76,27 @@ public class Robot extends TimedRobot
   {
     // Setup CAN ID 9 for the Intake Motor Test
     //AM Comment test. We need to update deviceId from 13 onwards
-    motor_elevator_one = new SparkMax(21, MotorType.kBrushless); // SparkMax is flashed to CAN id 9
-    motor_elevator_two = new SparkMax(22, MotorType.kBrushless); // SparkMax is flashed to CAN id
+    //motor_elevator_one = new SparkMax(21, MotorType.kBrushless); // SparkMax is flashed to CAN id 9
+    //motor_elevator_two = new SparkMax(22, MotorType.kBrushless); // SparkMax is flashed to CAN id
     motor_intake_one = new SparkMax(23, MotorType.kBrushless);
-    //DigitalInput intakesensor = new DigitalInput(1);
+    motor_arm = new SparkMax(25, MotorType.kBrushless);
+    motor_algae = new SparkMax(24, MotorType.kBrushless);
+    intakesensor = new DigitalInput(1);
 
     SparkMaxConfig config_ = new SparkMaxConfig();
+    //motor_intake_one.getEncoder().setPosition(0);
 
-    //config_.idleMode(SparkBaseConfig.IdleMode.kCoast);
-    //config_.smartCurrentLimit(40);
+    
+    config_.idleMode(SparkBaseConfig.IdleMode.kBrake);
+    config_.smartCurrentLimit(80);
     config_.openLoopRampRate(0.2);
     //config_.idleMode(IdleMode.kBrake);
     
-    motor_elevator_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    motor_elevator_two.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    //motor_intake_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-      //motor_elevator_two.setid
+    motor_intake_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    motor_algae.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    motor_arm.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    
+    
     // Operator Controller Port
     operator_controller = new XboxController(1);
 
@@ -199,30 +209,52 @@ public class Robot extends TimedRobot
   @Override
   public void teleopPeriodic()
   {
-    // Get the controller Y Axis for the Motor, and set it's motion to that
-    // motor_intake_one.set(new_joystick.getY());
-
-    // Set to RawAxis (CAN FIND ON DRIVER STATION #)
+    // Get the controller axis and button values ONCE and save to vars
     double rawaxis1 = operator_controller.getRawAxis(1);
-    // rawaxis1 = 0.2;
-    //double ravaxis5 = operator_controller.getRawAxis(5); 
+    double rawaxis2 = operator_controller.getRawAxis(2);
+    double rawaxis3 = operator_controller.getRawAxis(3);
+    double rawaxis5 = operator_controller.getRawAxis(5);
+    boolean leftbumperbutton = operator_controller.getLeftBumperButton();
+    boolean rightbumperbutton = operator_controller.getRightBumperButton();
+
+    System.out.println("JOystick rawxis1 : " + rawaxis1/2 +
+     " : Sensor output .get() : " + intakesensor.get() + 
+     " : left bumper : " + leftbumperbutton + 
+     " : right bumper : " + rightbumperbutton);
+
+    // CORAL INTAKE
+    if(intakesensor.get() == true)
+    {
+      motor_intake_one.set(rawaxis2/5);
+    }else
+    {
+      motor_intake_one.set(0);
+    }
+
+    // CORAL SHOOT
+    if(rawaxis3 > 0)
+    {
+      motor_intake_one.set(rawaxis3/5);
+    }
+
+    // ARM
+      motor_arm.set(rawaxis5); 
     
-    
-    //System.out.println("JOystick rawxis : " + rawaxis1 + " : sensor value : " + intakesensor.get() );
+    // ALGAE    
+      if(leftbumperbutton)
+      {
+        motor_algae.set(0.2);
+      } else if (rightbumperbutton)
+      {
+        motor_algae.set(-0.2);
+      } else {
+        motor_algae.set(0);
+      }
+        
+    // ELEVATOR
+    // motor_elevator_two.set(rawaxis1);
+    // motor_elevator_one.set(-rawaxis1);
 
-    System.out.println("JOystick rawxis : " + rawaxis1);
-
-
-    //motor_elevator_one.setVoltage(6);
-    //motor_elevator_two.setVoltage(-6);
-    motor_elevator_one.set(rawaxis1);
-    motor_elevator_two.set(-rawaxis1);
-    //motor_elevator_two.set(rawaxis1);
-    //motor_elevator_one.set(-rawaxis1);
-
-    //motor_intake_one.set(ravaxis5);
-
-    // motor_elevator_two.set(operator_controller.getRawAxis(1));
   }
 
   @Override
