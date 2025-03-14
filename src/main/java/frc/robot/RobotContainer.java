@@ -19,6 +19,9 @@ import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+
+import com.pathplanner.lib.auto.NamedCommands;
+
 import swervelib.SwerveInputStream;
 
 /**
@@ -121,6 +124,8 @@ public class RobotContainer {
    */
   public RobotContainer()
   {
+    //named command
+    NamedCommands.registerCommand("test", Commands.print("Hello World"));
     // Configure the trigger bindings
     configureBindings();
   }
@@ -190,7 +195,7 @@ public class RobotContainer {
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto");
+    return drivebase.getAutonomousCommand("New Auto2");
   }
 
   public void setDriveMode()
