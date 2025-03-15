@@ -259,13 +259,13 @@ public class Robot extends TimedRobot
     boolean leftbumperbutton = operator_controller.getLeftBumperButton();
     boolean rightbumperbutton = operator_controller.getRightBumperButton();
 
-    
+    /* 
     System.out.println("rawxis1 : " + rawaxis1 +
      " : Sensor.get() : " + intakesensor.get() + 
      " : ELE1 POS : " + motor_elevator_one_encoder.getPosition() +
      " : ELE2 POS : " + motor_elevator_two_encoder.getPosition());
     
-     /* 
+     
      System.out.println("x  : " + operator_controller.getXButton() +
      " : " + operator_controller.getAButton() +
      " : " + operator_controller.getYButton() +
@@ -279,7 +279,7 @@ public class Robot extends TimedRobot
     /////////////////
     if(intakesensor.get() == true)
     {
-      motor_intake_one.set(rawaxis2/8);
+      motor_intake_one.set(rawaxis2/4);
     }else
     {
       motor_intake_one.set(0);
