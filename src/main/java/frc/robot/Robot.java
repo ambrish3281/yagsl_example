@@ -62,6 +62,7 @@ public class Robot extends TimedRobot
   private final PIDController motor_elevator_two_pidc = new PIDController(0.5, 0, 0); // Tune PID values
   private static final double WHEEL_CIRCUMFERENCE = 0.159593026;
   private static final double GEAR_RATIO = 40;
+  private static double INIT_ENCODER ;
   private double targetRotations = 0;
   private boolean movingToTarget = false;
 
@@ -104,10 +105,12 @@ public class Robot extends TimedRobot
 
     motor_elevator_one_encoder.setPosition(0);
     motor_elevator_two_encoder.setPosition(0);  
+    Timer.delay(0.02);
     System.out.println("ELE1 POSITION AFTER SET 0:" + motor_elevator_one_encoder.getPosition());  
     System.out.println("ELE2 POSITION AFTER SET 0:" + motor_elevator_two_encoder.getPosition());  
     System.out.flush();
     System.out.flush();
+    INIT_ENCODER = motor_elevator_one_encoder.getPosition(); // INITIAL ENCOER VALUE
 
     ///////////////
     motor_intake_one = new SparkMax(23, MotorType.kBrushless);
@@ -261,7 +264,7 @@ public class Robot extends TimedRobot
      " : Sensor.get() : " + intakesensor.get() + 
      " : ELE1 POS : " + motor_elevator_one_encoder.getPosition() +
      " : ELE2 POS : " + motor_elevator_two_encoder.getPosition());
-
+    
      /* 
      System.out.println("x  : " + operator_controller.getXButton() +
      " : " + operator_controller.getAButton() +
@@ -303,7 +306,6 @@ public class Robot extends TimedRobot
       //}
         
     // ELEVATOR
-
     if (Math.abs(rawaxis1) < 0.05)
     {
       motor_elevator_two.set(0.05);
@@ -314,20 +316,35 @@ public class Robot extends TimedRobot
     motor_elevator_one.set(rawaxis1);
     } // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
 
+    
     // TEST TEST TEST
     
-   if (operator_controller.getXButton() == true) { 
-     moveDistance(5); // Move 1 meter
+   if (operator_controller.getXButton() == true) { // HOME = X BUTTON
+     moveDistance(0.5); // Move 1 meter
+   }
+
+   if (operator_controller.getYButton() == true) { // L1 = Y BUTTON
+    moveDistance(6); // Move 1 meter
+  }
+
+  if (operator_controller.getBButton() == true) { // L2 = B BUTTON
+    moveDistance(18); // Move 1 meter
+  }
+
+  if (operator_controller.getAButton() == true) { // L3 = A BUTTON
+    moveDistance(34); // Move 1 meter
+  }
 
   // Run PID control if we are actively moving to a target
   
-  if (movingToTarget) {
+  if (movingToTarget)
+  {
     double currentPosition = motor_elevator_one_encoder.getPosition();
     double error = targetRotations - currentPosition;
     double pidOutput = motor_elevator_one_pidc.calculate(currentPosition, targetRotations);
 
-    motor_elevator_one.set(pidOutput); // Apply PID output
-    motor_elevator_two.set(pidOutput); // Apply PID output
+    motor_elevator_one.set(0.3 * Math.signum(error)); // Apply PID output
+    motor_elevator_two.set(0.3 * Math.signum(error)); // Apply PID output
 
 
     SmartDashboard.putNumber("Motor Position", currentPosition);
@@ -335,27 +352,35 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber("Motor Power", pidOutput);
     SmartDashboard.putNumber("Error", error);
 
+    /* 
+    System.out.println("currentPosition : " + currentPosition
+    + " : targetRotations : " + targetRotations
+    + " : pidOutput : " + pidOutput
+    + ": error :" + error);
+    */
+
+
     // Stop if close enough OR if the PID output changes direction (prevents overshoot)
-    if (Math.abs(error) < 0.05 || Math.signum(pidOutput) != Math.signum(error)) {
-        motor_elevator_one.set(0);
-        motor_elevator_two.set(0);
+    if (Math.abs(error) < 0.1) 
+    {
+      System.out.println( " : errorval : " + error + ": currentPosition : " + motor_elevator_one_encoder.getPosition()) ;
+
+        motor_elevator_one.set(0.05);
+        motor_elevator_two.set(0.05);
         movingToTarget = false;
     }
+  }}
         
-}
 
-  
-
-
-    
-  
- 
   public void moveDistance(double inchesdist) {
     //targetRotations = (meters / WHEEL_CIRCUMFERENCE) * GEAR_RATIO;
     targetRotations = inchesdist * 1.82;
-    motor_elevator_one_encoder.setPosition(0); // Reset encoder before starting
+    //motor_elevator_one_encoder.setPosition(0); // Reset encoder before starting
     motor_elevator_one_pidc.reset();
     movingToTarget = true;
+    System.out.println( " : targetRotations : " + targetRotations);
+    System.out.println( " : CURRENT POSITION : " + motor_elevator_one_encoder.getPosition());
+    System.out.println( " : ERRORVAL  : " + (targetRotations - motor_elevator_one_encoder.getPosition()));
 }
     
     
