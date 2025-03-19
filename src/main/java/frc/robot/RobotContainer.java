@@ -20,6 +20,8 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
+import javax.lang.model.util.ElementScanner14;
+
 import com.pathplanner.lib.auto.NamedCommands;
 
 import swervelib.SwerveInputStream;
@@ -126,6 +128,9 @@ public class RobotContainer {
   {
     //named command
     NamedCommands.registerCommand("test", Commands.print("Hello World"));
+    NamedCommands.registerCommand("eleraise", new AutoCoralRaise(5));
+    NamedCommands.registerCommand("coralshoot", new AutoCoralShoot());
+
     // Configure the trigger bindings
     configureBindings();
   }
@@ -195,7 +200,29 @@ public class RobotContainer {
   public Command getAutonomousCommand()
   {
     // An example command will be run in autonomous
-    return drivebase.getAutonomousCommand("New Auto2");
+    String autoname ;
+    if (Robot.alliancelocation == 1)
+    {
+      autoname = "auto19" ;
+    } else if (Robot.alliancelocation == 2)
+    {
+      autoname = "auto29" ;
+    } else if (Robot.alliancelocation == 3)
+    {
+      autoname = "auto39" ;
+    } else 
+    {
+      autoname = "auto0" ;
+    }
+    
+    
+    // ******************* TEST ONLY REMOVE LATER
+   // autoname = "testauto1";
+    // ******************** TEST ONLY REMOVE LATER
+
+
+    System.out.println("AUTO NAME : " + autoname);
+    return drivebase.getAutonomousCommand(autoname);
   }
 
   public void setDriveMode()

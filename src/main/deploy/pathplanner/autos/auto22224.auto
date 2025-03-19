@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "path2222"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "test"
+            "name": "eleraise"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "coralshoot"
           }
         }
       ]

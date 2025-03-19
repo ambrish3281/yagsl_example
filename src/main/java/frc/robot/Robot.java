@@ -22,6 +22,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import javax.lang.model.util.ElementScanner14;
 
@@ -49,29 +51,31 @@ public class Robot extends TimedRobot
   private Timer disabledTimer;
 
   // Setup the variables
-  private SparkMax motor_intake_one;
-  private SparkMax motor_intake_two;
-  private SparkMax motor_intake_three;
-  private SparkMax motor_elevator_one;
-  private SparkMax motor_elevator_two;
+  public static SparkMax motor_intake_one;
+  public static SparkMax motor_intake_two;
+  public static SparkMax motor_intake_three;
+  public static SparkMax motor_elevator_one;
+  public static SparkMax motor_elevator_two;
 
   // STUFF FOR ELEVATOR PID CONTROLLER FIXED POSITIONS
-  private RelativeEncoder motor_elevator_one_encoder;
-  private RelativeEncoder motor_elevator_two_encoder;
-  private final PIDController motor_elevator_one_pidc = new PIDController(0.5, 0, 0); // Tune PID values
-  private final PIDController motor_elevator_two_pidc = new PIDController(0.5, 0, 0); // Tune PID values
-  private static final double WHEEL_CIRCUMFERENCE = 0.159593026;
-  private static final double GEAR_RATIO = 40;
-  private static double INIT_ENCODER ;
-  private double targetRotations = 0;
-  private boolean movingToTarget = false;
+  public static RelativeEncoder motor_elevator_one_encoder;
+  public static RelativeEncoder motor_elevator_two_encoder;
+  public static PIDController motor_elevator_one_pidc = new PIDController(0.5, 0, 0); // Tune PID values
+  public static PIDController motor_elevator_two_pidc = new PIDController(0.5, 0, 0); // Tune PID values
+  public static double WHEEL_CIRCUMFERENCE = 0.159593026;
+  public static double GEAR_RATIO = 40;
+  public static double INIT_ENCODER ;
+  public static double targetRotations = 0;
+  public static boolean movingToTarget = false;
 
-
+            
   private XboxController operator_controller;
   private Joystick new_joystick;
   private DigitalInput intakesensor;
   private SparkFlex motor_arm;
   private SparkMax motor_algae;
+  public static int alliancelocation = 999;
+  public static String robotalliance = "NONE";
 
   /* We can add     enableLiveWindowInTest(true);
  to see live data in Smartboard Ambrish */
@@ -91,6 +95,36 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+  
+
+    // ALLIANCE AND LOC - DEFINSIVE LOGIC DUE TO SOME WHACKY WPILIB LOGIC
+
+    if(DriverStation.getAlliance().isPresent() == true)
+    {
+      Alliance ra = DriverStation.getAlliance().get();
+      robotalliance = ra.toString();
+    }
+
+    if(DriverStation.getLocation().isPresent() == true)
+    {
+      alliancelocation = DriverStation.getLocation().getAsInt();
+    }
+
+    System.out.println("DS ALLIANCE : " + robotalliance);
+    System.out.println("DS ALLIANCE LOCATION : " + alliancelocation);
+
+
+    // ************************  FOR TEST PLS REMOVE 
+    //robotalliance = "Red";
+    //alliancelocation = 999;
+    // ************************  FOR TEST PLS REMOVE 
+
+
+    System.out.println("final ALLIANCE : " + robotalliance);
+    System.out.println("final ALLIANCE LOCATION : " + alliancelocation);
+
+
+    
     // Setup CAN ID 9 for the Intake Motor Test
     //AM Comment test. We need to update deviceId from 13 onwards
     motor_elevator_one = new SparkMax(21, MotorType.kBrushless); // SparkMax is flashed to CAN id 9
@@ -201,6 +235,37 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit()
   {
+
+
+
+    
+    // ALLIANCE AND LOC - DEFINSIVE LOGIC DUE TO SOME WHACKY WPILIB LOGIC
+
+    if(DriverStation.getAlliance().isPresent() == true)
+    {
+      Alliance ra = DriverStation.getAlliance().get();
+      robotalliance = ra.toString();
+    }
+
+    if(DriverStation.getLocation().isPresent() == true)
+    {
+      alliancelocation = DriverStation.getLocation().getAsInt();
+    }
+
+    System.out.println("DS ALLIANCE : " + robotalliance);
+    System.out.println("DS ALLIANCE LOCATION : " + alliancelocation);
+
+
+    // ************************  FOR TEST PLS REMOVE 
+    //robotalliance = "Red";
+    //alliancelocation = 999;
+    // ************************  FOR TEST PLS REMOVE 
+
+
+    System.out.println("final ALLIANCE : " + robotalliance);
+    System.out.println("final ALLIANCE LOCATION : " + alliancelocation);
+
+
     m_robotContainer.setMotorBrake(true);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -279,7 +344,14 @@ public class Robot extends TimedRobot
     /////////////////
     if(intakesensor.get() == true)
     {
-      motor_intake_one.set(rawaxis2/4);
+      if(rawaxis2 > 0)
+      {
+      motor_intake_one.set(0.12);
+      }else
+      {
+              motor_intake_one.set(0);
+
+      }
     }else
     {
       motor_intake_one.set(0);
@@ -288,7 +360,17 @@ public class Robot extends TimedRobot
     // CORAL SHOOT
     if(rawaxis3 > 0)
     {
-      motor_intake_one.set(rawaxis3/5);
+      motor_intake_one.set(rawaxis3/9);
+          System.out.println("shoot speed : " + rawaxis3/9);
+
+    }
+
+    if (rightbumperbutton)
+    {
+            motor_intake_one.set(0.11111111111);
+            System.out.println("Rightbumper shoot speed : " + 0.11111111111);
+
+
     }
 
     // ARM
@@ -308,8 +390,8 @@ public class Robot extends TimedRobot
     // ELEVATOR
     if (Math.abs(rawaxis1) < 0.05)
     {
-      motor_elevator_two.set(0.05);
-      motor_elevator_one.set(0.05);
+      motor_elevator_two.set(0.025);
+      motor_elevator_one.set(0.025);
     }else
     {
     motor_elevator_two.set(rawaxis1); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
@@ -320,11 +402,11 @@ public class Robot extends TimedRobot
     // TEST TEST TEST
     
    if (operator_controller.getXButton() == true) { // HOME = X BUTTON
-     moveDistance(0.5); // Move 1 meter
+     moveDistance(0.1); // Move 1 meter
    }
 
    if (operator_controller.getYButton() == true) { // L1 = Y BUTTON
-    moveDistance(6); // Move 1 meter
+    moveDistance(5); // Move 1 meter
   }
 
   if (operator_controller.getBButton() == true) { // L2 = B BUTTON
@@ -365,8 +447,8 @@ public class Robot extends TimedRobot
     {
       System.out.println( " : errorval : " + error + ": currentPosition : " + motor_elevator_one_encoder.getPosition()) ;
 
-        motor_elevator_one.set(0.05);
-        motor_elevator_two.set(0.05);
+        motor_elevator_one.set(0.025);
+        motor_elevator_two.set(0.025);
         movingToTarget = false;
     }
   }}
