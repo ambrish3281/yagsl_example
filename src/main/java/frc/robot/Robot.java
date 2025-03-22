@@ -123,20 +123,27 @@ public class Robot extends TimedRobot
     System.out.println("final ALLIANCE : " + robotalliance);
     System.out.println("final ALLIANCE LOCATION : " + alliancelocation);
 
+    intakesensor = new DigitalInput(1);
 
-    
-    // Setup CAN ID 9 for the Intake Motor Test
-    //AM Comment test. We need to update deviceId from 13 onwards
+    motor_intake_one = new SparkMax(23, MotorType.kBrushless);
+     //motor_arm = new SparkFlex(31, MotorType.kBrushless);
+    //motor_algae = new SparkMax(24, MotorType.kBrushless);
     motor_elevator_one = new SparkMax(21, MotorType.kBrushless); // SparkMax is flashed to CAN id 9
     motor_elevator_two = new SparkMax(22, MotorType.kBrushless); // SparkMax is flashed to CAN id
+    SparkMaxConfig config_ = new SparkMaxConfig();        
+    config_.idleMode(SparkBaseConfig.IdleMode.kBrake);
+    motor_intake_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    motor_elevator_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    motor_elevator_two.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    //motor_algae.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    //motor_arm.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    
     motor_elevator_one_encoder = motor_elevator_one.getEncoder();
     motor_elevator_two_encoder = motor_elevator_two.getEncoder();
-
     System.out.println("ELE1 POSITION BEFORE SET 0:" + motor_elevator_one_encoder.getPosition());  
     System.out.println("ELE2 POSITION BEFORE SET 0:" + motor_elevator_two_encoder.getPosition());  
     System.out.flush();
     System.out.flush();
-
     motor_elevator_one_encoder.setPosition(0);
     motor_elevator_two_encoder.setPosition(0);  
     Timer.delay(0.02);
@@ -145,30 +152,7 @@ public class Robot extends TimedRobot
     System.out.flush();
     System.out.flush();
     INIT_ENCODER = motor_elevator_one_encoder.getPosition(); // INITIAL ENCOER VALUE
-
-    ///////////////
-    motor_intake_one = new SparkMax(23, MotorType.kBrushless);
-    //motor_arm = new SparkFlex(31, MotorType.kBrushless);
-    //motor_algae = new SparkMax(24, MotorType.kBrushless);
-    ////////////////
-    intakesensor = new DigitalInput(1);
-
-    SparkMaxConfig config_ = new SparkMaxConfig();
-    //motor_intake_one.getEncoder().setPosition(0);
-
-    
-    config_.idleMode(SparkBaseConfig.IdleMode.kBrake);
-    //config_.smartCurrentLimit(80);
-    //config_.openLoopRampRate(0.2);
-    //config_.idleMode(IdleMode.kBrake);
-    
-    motor_intake_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    motor_elevator_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    motor_elevator_two.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    //motor_algae.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    //motor_arm.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
-    
-    
+    movingToTarget = false;
     // Operator Controller Port
     operator_controller = new XboxController(1);
 
@@ -304,6 +288,12 @@ public class Robot extends TimedRobot
     }
     /*Below line can be commented out  based on feedback */
     m_robotContainer.setDriveMode();
+    System.out.println(movingToTarget);
+    
+    movingToTarget = false;
+
+    System.out.println(movingToTarget);
+    
   }
 
 
@@ -360,8 +350,9 @@ public class Robot extends TimedRobot
     // CORAL SHOOT
     if(rawaxis3 > 0)
     {
-      motor_intake_one.set(rawaxis3/9);
-          System.out.println("shoot speed : " + rawaxis3/9);
+      motor_intake_one.set(0.12);
+      //motor_intake_one.set(rawaxis3/4);
+          System.out.println("shoot speed : " + 0.19);
 
     }
 
@@ -390,12 +381,22 @@ public class Robot extends TimedRobot
     // ELEVATOR
     if (Math.abs(rawaxis1) < 0.05)
     {
-      motor_elevator_two.set(0.025);
-      motor_elevator_one.set(0.025);
-    }else
+      motor_elevator_two.set(0.09);
+      motor_elevator_one.set(0.09);
+     // System.out.println("ELE ZERO : " + 0.04);
+
+    }else if (rawaxis1 < 0) // UP
     {
-    motor_elevator_two.set(rawaxis1); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-    motor_elevator_one.set(rawaxis1);
+      motor_elevator_two.set(0.3); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_one.set(0.3);
+    //System.out.println("ELE UP : " + 0.3);
+   
+    } else                  // DOWN
+    {
+    motor_elevator_two.set(0.03); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+    motor_elevator_one.set(0.03);
+    //System.out.println("ELE DOWN : " + 0.03);
+
     } // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
 
     
@@ -410,11 +411,26 @@ public class Robot extends TimedRobot
   }
 
   if (operator_controller.getBButton() == true) { // L2 = B BUTTON
-    moveDistance(18); // Move 1 meter
+    moveDistance(13); // Move 1 meter
   }
 
-  if (operator_controller.getAButton() == true) { // L3 = A BUTTON
-    moveDistance(34); // Move 1 meter
+  if (operator_controller.getAButton() == true) { // L3 / TESTING L1 FOR NOW ***********************
+   // moveDistance(29); // Move 1 meter
+
+   motor_intake_one.set(0.12);
+   Timer.delay(0.1);
+
+   motor_elevator_two.set(0.4); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+   motor_elevator_one.set(0.4); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+   
+   Timer.delay(0.5);
+
+    motor_elevator_two.set(0.09); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+   motor_elevator_one.set(0.09); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+   motor_intake_one.set(0);
+  
+
+
   }
 
   // Run PID control if we are actively moving to a target
@@ -425,8 +441,20 @@ public class Robot extends TimedRobot
     double error = targetRotations - currentPosition;
     double pidOutput = motor_elevator_one_pidc.calculate(currentPosition, targetRotations);
 
-    motor_elevator_one.set(0.3 * Math.signum(error)); // Apply PID output
-    motor_elevator_two.set(0.3 * Math.signum(error)); // Apply PID output
+    if(Math.signum(error) > 0)
+    {
+      motor_elevator_two.set(0.3); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_one.set(0.3); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+
+    }else
+    {
+      motor_elevator_two.set(0.03); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_one.set(0.03); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+
+    }
+
+    //motor_elevator_one.set(0.3 * Math.signum(error)); // Apply PID output
+    //motor_elevator_two.set(0.3 * Math.signum(error)); // Apply PID output
 
 
     SmartDashboard.putNumber("Motor Position", currentPosition);
@@ -447,8 +475,9 @@ public class Robot extends TimedRobot
     {
       System.out.println( " : errorval : " + error + ": currentPosition : " + motor_elevator_one_encoder.getPosition()) ;
 
-        motor_elevator_one.set(0.025);
-        motor_elevator_two.set(0.025);
+         motor_elevator_two.set(0.09);
+         motor_elevator_one.set(0.09);
+
         movingToTarget = false;
     }
   }}
@@ -456,7 +485,7 @@ public class Robot extends TimedRobot
 
   public void moveDistance(double inchesdist) {
     //targetRotations = (meters / WHEEL_CIRCUMFERENCE) * GEAR_RATIO;
-    targetRotations = inchesdist * 1.82;
+    targetRotations = inchesdist * 0.395;
     //motor_elevator_one_encoder.setPosition(0); // Reset encoder before starting
     motor_elevator_one_pidc.reset();
     movingToTarget = true;
