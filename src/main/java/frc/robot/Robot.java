@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -43,6 +44,12 @@ import edu.wpi.first.wpilibj.Joystick;
 public class Robot extends TimedRobot
 {
 
+// AUTO TEST
+    private Pose2d initialPose;
+    private boolean ranAutoTest = false;
+    private Timer timer = new Timer();
+
+
   private static Robot   instance;
   private        Command m_autonomousCommand;
 
@@ -76,6 +83,9 @@ public class Robot extends TimedRobot
   private SparkMax motor_algae;
   public static int alliancelocation = 999;
   public static String robotalliance = "NONE";
+
+
+  public static LimelightVision lv;
 
   /* We can add     enableLiveWindowInTest(true);
  to see live data in Smartboard Ambrish */
@@ -155,6 +165,13 @@ public class Robot extends TimedRobot
     movingToTarget = false;
     // Operator Controller Port
     operator_controller = new XboxController(1);
+
+
+
+    // APRIL TAG SETUP
+    lv = new LimelightVision();
+    
+    
 
     // Left Hand Joystick Port
     // new_joystick = new Joystick(1);
@@ -258,7 +275,20 @@ public class Robot extends TimedRobot
     {
       m_autonomousCommand.schedule();
     }
+
+
+    // AUTO TEST
+    /*
+    initialPose = m_robotContainer   .getPose();
+    timer.reset();
+    timer.start();
+    ranAutoTest = false;
+    System.out.println("Starting test: initial pose = " + initialPose.getTranslation());
+    */
   }
+    
+    
+  
 
   /**
    * This function is called periodically during autonomous.
@@ -461,6 +491,8 @@ public class Robot extends TimedRobot
     SmartDashboard.putNumber("Target Position", targetRotations);
     SmartDashboard.putNumber("Motor Power", pidOutput);
     SmartDashboard.putNumber("Error", error);
+    SmartDashboard.putNumber("TEST VALUE", 55);
+
 
     /* 
     System.out.println("currentPosition : " + currentPosition

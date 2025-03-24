@@ -174,12 +174,20 @@ public class RobotContainer {
           drivebase.driveToPose(
               new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
                               );
-      driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
+     // driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
+      driverXbox.y().whileTrue(new DriveToTagSimple(drivebase, Robot.lv, 0));
+
+      // Reef alignment
+      driverXbox.povRight().onTrue(new AlignToReefTagRelative(true, drivebase).withTimeout(3));
+      driverXbox.povLeft().onTrue(new AlignToReefTagRelative(false, drivebase).withTimeout(3));
+
+
     }
+    //driverXbox.y().whileTrue(new DriveToTagCommand(drivebase,lv,10,0));
 
     try{
 
