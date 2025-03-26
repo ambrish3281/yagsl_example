@@ -179,7 +179,7 @@ public class RobotContainer {
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
-      driverXbox.y().whileTrue(new DriveToTagSimple(drivebase, Robot.lv, 0));
+      //driverXbox.y().whileTrue(new  DriveToTagSimple(drivebase, Robot.lv, 0));
 
       // Reef alignment
       driverXbox.povRight().onTrue(new AlignToReefTagRelative(true, drivebase).withTimeout(3));

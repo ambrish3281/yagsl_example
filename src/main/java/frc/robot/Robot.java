@@ -20,16 +20,22 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import javax.lang.model.util.ElementScanner14;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -75,6 +81,13 @@ public class Robot extends TimedRobot
   public static double targetRotations = 0;
   public static boolean movingToTarget = false;
 
+  // ALGAE
+
+  public static SparkFlex algae_raise_motor;
+  public static SparkFlex algae_spin_motor;
+  public static SparkClosedLoopController  algae_raise_motor_pidc; // Tune PID values
+  public static RelativeEncoder  algae_raise_motor_encoder;
+
             
   private XboxController operator_controller;
   private Joystick new_joystick;
@@ -83,6 +96,7 @@ public class Robot extends TimedRobot
   private SparkMax motor_algae;
   public static int alliancelocation = 999;
   public static String robotalliance = "NONE";
+  private boolean wasTeleop = false;
 
 
   public static LimelightVision lv;
@@ -173,6 +187,27 @@ public class Robot extends TimedRobot
     
     
 
+    // ALGAE SETUP
+
+    algae_spin_motor = new SparkFlex(32, MotorType.kBrushless); // SparkMax is flashed to CAN id
+    
+    
+    algae_raise_motor = new SparkFlex(31, MotorType.kBrushless); // SparkMax is flashed to CAN id
+    SparkFlexConfig config2_ = new SparkFlexConfig();        
+    config2_.idleMode(SparkBaseConfig.IdleMode.kBrake);
+    ClosedLoopConfig pidConfig2 = new ClosedLoopConfig();
+    pidConfig2.pid(0.5,0,0);
+    config2_.apply(pidConfig2);
+    algae_raise_motor.configure(config2_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+
+    algae_raise_motor_encoder = algae_raise_motor.getEncoder();
+    algae_raise_motor_encoder.setPosition(0.0); // Assume arm is hanging down at boot
+
+    // Set up onboard PID constants
+
+
+    algae_raise_motor_pidc = algae_raise_motor.getClosedLoopController();
+
     // Left Hand Joystick Port
     // new_joystick = new Joystick(1);
 
@@ -218,6 +253,22 @@ public class Robot extends TimedRobot
     m_robotContainer.setMotorBrake(true);
     disabledTimer.reset();
     disabledTimer.start();
+
+
+    // remove ELE brake mode
+    /* 
+    if (wasTeleop) {
+
+      SparkMaxConfig config_ = new SparkMaxConfig();        
+      config_.idleMode(SparkBaseConfig.IdleMode.kCoast);
+      motor_elevator_one.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+      motor_elevator_two.configure(config_, SparkBase.ResetMode.kResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
+    
+      System.out.println("TELEOP DISABLED : ELE MOTOR NOW IN COAST MODE , NOT BRAKE ");
+      wasTeleop = false; // Reset the flag
+    }
+      */
+      
   }
 
   @Override
@@ -301,6 +352,8 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit()
   {
+
+    
     // motor_elevator_one.set(0.1);
     //motor_intake_one.set(controller.getY(Hand.kLeft));
     // motor_intake_one.set(controller.getY(XboxController.Button.kA));
@@ -321,9 +374,11 @@ public class Robot extends TimedRobot
     System.out.println(movingToTarget);
     
     movingToTarget = false;
+    System.out.println("movingToTarget : " + movingToTarget);
 
-    System.out.println(movingToTarget);
-    
+    wasTeleop = true;
+    System.out.println("wasTeleop : " + wasTeleop);
+
   }
 
 
@@ -343,6 +398,7 @@ public class Robot extends TimedRobot
     double rawaxis5 = operator_controller.getRawAxis(5);
     boolean leftbumperbutton = operator_controller.getLeftBumperButton();
     boolean rightbumperbutton = operator_controller.getRightBumperButton();
+    int opPOV = operator_controller.getPOV();
 
     /* 
     System.out.println("rawxis1 : " + rawaxis1 +
@@ -360,7 +416,55 @@ public class Robot extends TimedRobot
      System.out.flush();
 
 */
-    // CORAL INTAKE
+
+
+    // ALGAE
+
+    System.out.println("ALGAE SPIN ROTATIONS : " + algae_spin_motor.getEncoder().getPosition());
+    System.out.println("ALGAE ARM ROTATIONS : " + algae_raise_motor.getEncoder().getPosition());
+
+    System.out.println("opPOV : " + opPOV);
+
+
+    if (leftbumperbutton)
+    {
+      System.out.println("PRESSED LEFT bumper ");
+      algae_spin_motor.set(0.2);
+    }else if (rightbumperbutton)
+    {
+      System.out.println("PRESSED RIGHT bumper ");
+      algae_spin_motor.set(-0.2);
+    }else 
+    {
+      algae_spin_motor.set(0);
+    }
+
+
+    if (rawaxis5 > 0.05)
+    {
+      System.out.println("PRESSED RIGHT JOYST POSITIVE ");
+      algae_raise_motor.set(-0.02);
+    }else if (rawaxis5 < -0.05) // UP
+    {
+      System.out.println("PRESSED RIGHT JOYST NEGETIVE ");
+      algae_raise_motor.set(0.15);
+    }else 
+    {
+      System.out.println("ALGAE ARM STOP ");
+      algae_raise_motor.set(0.04); // MIGHT NEED FEED FORWARD
+    }
+
+
+
+    /* 
+    if (opPOV == 0) {
+         algae_raise_motor_pidc.setReference(3.0, ControlType.kPosition, ClosedLoopSlot.kSlot0); // Use PID slot 0
+        //algae_raise_motor_pidc.setReference(3,ControlType.kPosition);   
+    }
+    */
+
+
+        // CORAL INTAKE
     /////////////////
     if(intakesensor.get() == true)
     {
@@ -386,6 +490,7 @@ public class Robot extends TimedRobot
 
     }
 
+    /* 
     if (rightbumperbutton)
     {
             motor_intake_one.set(0.11111111111);
@@ -393,6 +498,7 @@ public class Robot extends TimedRobot
 
 
     }
+            */
 
     // ARM
       //motor_arm.set(rawaxis5); 
@@ -409,19 +515,31 @@ public class Robot extends TimedRobot
       //}
         
     // ELEVATOR
+
+//          System.out.println("ELE SPEED IN PERIODIC: " + motor_elevator_one.get());
+
+    /* 
     if (Math.abs(rawaxis1) < 0.05)
     {
-      motor_elevator_two.set(0.09);
-      motor_elevator_one.set(0.09);
-     // System.out.println("ELE ZERO : " + 0.04);
+      System.out.println("JOYSTICK ELE MOVE - ENC CURR POS : " + motor_elevator_one_encoder.getPosition() );
+      double spd = 0;
+      if(motor_elevator_one.getEncoder().getPosition() < 0.08) 
+      {
+        spd = 0; // TURN OFF MOTOR IF CLOSE TO HOME
+      }else{
+        spd = 0.05; // FEED FORWARD
+      }
+      motor_elevator_two.set(spd);
+      motor_elevator_one.set(spd);
+      System.out.println("ELE SPEED AT 0 JOYST: " + motor_elevator_two.get());
 
-    }else if (rawaxis1 < 0) // UP
+    }else if (rawaxis1 < 0.05) // UP
     {
-      motor_elevator_two.set(0.3); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-      motor_elevator_one.set(0.3);
+      motor_elevator_two.set(0.4); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_one.set(0.4);
     //System.out.println("ELE UP : " + 0.3);
    
-    } else                  // DOWN
+    } else if (rawaxis1 > 0.05)                 // DOWN
     {
     motor_elevator_two.set(0.03); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
     motor_elevator_one.set(0.03);
@@ -429,15 +547,19 @@ public class Robot extends TimedRobot
 
     } // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
 
+    */
+
     
     // TEST TEST TEST
     
    if (operator_controller.getXButton() == true) { // HOME = X BUTTON
-     moveDistance(0.1); // Move 1 meter
+     moveDistance(0.0); // 
    }
 
+
+   //L! MAGUC NUMBER IS 25.25 INCH
    if (operator_controller.getYButton() == true) { // L1 = Y BUTTON
-    moveDistance(5); // Move 1 meter
+    moveDistance(6); // Move 1 meter
   }
 
   if (operator_controller.getBButton() == true) { // L2 = B BUTTON
@@ -445,22 +567,7 @@ public class Robot extends TimedRobot
   }
 
   if (operator_controller.getAButton() == true) { // L3 / TESTING L1 FOR NOW ***********************
-   // moveDistance(29); // Move 1 meter
-
-   motor_intake_one.set(0.12);
-   Timer.delay(0.1);
-
-   motor_elevator_two.set(0.4); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-   motor_elevator_one.set(0.4); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-   
-   Timer.delay(0.5);
-
-    motor_elevator_two.set(0.09); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-   motor_elevator_one.set(0.09); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-   motor_intake_one.set(0);
-  
-
-
+    moveDistance(29); // Move 1 meter
   }
 
   // Run PID control if we are actively moving to a target
@@ -471,15 +578,17 @@ public class Robot extends TimedRobot
     double error = targetRotations - currentPosition;
     double pidOutput = motor_elevator_one_pidc.calculate(currentPosition, targetRotations);
 
-    if(Math.signum(error) > 0)
+    if(Math.signum(error) > 0) // UP SPEED SET
     {
-      motor_elevator_two.set(0.3); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-      motor_elevator_one.set(0.3); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_two.set(0.25); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_one.set(0.25); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      //System.out.println("ELE SPEED GOIN UP: " + motor_elevator_one.get());
 
-    }else
+    }else                       // DOWN SPEED SET
     {
-      motor_elevator_two.set(0.03); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-      motor_elevator_one.set(0.03); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_two.set(-0.15); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_one.set(-0.15); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      //System.out.println("ELE SPEED GOIN DOWN : " + motor_elevator_one.get());
 
     }
 
@@ -503,21 +612,36 @@ public class Robot extends TimedRobot
 
 
     // Stop if close enough OR if the PID output changes direction (prevents overshoot)
-    if (Math.abs(error) < 0.1) 
+    if ((Math.abs(error) < 0.1) && targetRotations == 0) 
     {
+      System.out.println("AT HOME HEIGHT - SETTING 0 FEED FORWARD");
       System.out.println( " : errorval : " + error + ": currentPosition : " + motor_elevator_one_encoder.getPosition()) ;
 
-         motor_elevator_two.set(0.09);
-         motor_elevator_one.set(0.09);
+        motor_elevator_two.set(0.0);
+        motor_elevator_one.set(0.0);
+        //System.out.println("ELE SPEED : " + motor_elevator_one.get());
+
 
         movingToTarget = false;
+    } else if((Math.abs(error) < 0.1)){
+      System.out.println("REACHED : " + targetRotations);
+      System.out.println( " : errorval : " + error + ": currentPosition : " + motor_elevator_one_encoder.getPosition()) ;
+
+        motor_elevator_two.set(0.02); // FEED FORWARD
+        motor_elevator_one.set(0.02);
+        //System.out.println("ELE SPEED : " + motor_elevator_one.get());
+
+        movingToTarget = false;
+
+
     }
   }}
         
 
   public void moveDistance(double inchesdist) {
     //targetRotations = (meters / WHEEL_CIRCUMFERENCE) * GEAR_RATIO;
-    targetRotations = inchesdist * 0.395;
+    //targetRotations = inchesdist * 0.395;
+    targetRotations = inchesdist * 1.82;
     //motor_elevator_one_encoder.setPosition(0); // Reset encoder before starting
     motor_elevator_one_pidc.reset();
     movingToTarget = true;
