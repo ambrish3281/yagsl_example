@@ -36,7 +36,7 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
+  public final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve"));
   // Applies deadbands and inverts controls because joysticks
   // are back-right positive while robot
@@ -128,8 +128,21 @@ public class RobotContainer {
   {
     //named command
     NamedCommands.registerCommand("test", Commands.print("Hello World"));
-    NamedCommands.registerCommand("eleraise", new AutoCoralRaise(5));
+    NamedCommands.registerCommand("eleraiseL1", new AutoCoralRaise(6));
+        NamedCommands.registerCommand("eleraiseL2", new AutoCoralRaise(14));
+    NamedCommands.registerCommand("eleraiseL3", new AutoCoralRaise(30));
+
     NamedCommands.registerCommand("coralshoot", new AutoCoralShoot());
+    NamedCommands.registerCommand("alignright", new AlignToReefTagRelative(1, drivebase));
+    NamedCommands.registerCommand("alignleft", new AlignToReefTagRelative(0, drivebase));
+    NamedCommands.registerCommand("aligncenter", new AlignToReefTagRelative(2, drivebase));
+
+
+
+   // driverXbox.povRight().onTrue(new AlignToReefTagRelative(1, drivebase).withTimeout(3));
+    //  driverXbox.povLeft().onTrue(new AlignToReefTagRelative(0, drivebase).withTimeout(3));
+    //  driverXbox.povUp().onTrue(new AlignToReefTagRelative(2, drivebase).withTimeout(3));
+
 
     // Configure the trigger bindings
     configureBindings();

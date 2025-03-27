@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import swervelib.SwerveDrive;
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.ClosedLoopConfig;
@@ -215,7 +218,7 @@ public class Robot extends TimedRobot
     System.out.println("RAISING ARM START <<<<<<<<<<<<<<<<<<<<<<<");
     // Run the motor for 2 seconds
     while (timeralg.get() < 2.0) {
-      System.out.println("RAISING ARM RUNNING <<<<<<<<<<<<<<<<<<<<<<<");
+     // System.out.println("RAISING ARM RUNNING <<<<<<<<<<<<<<<<<<<<<<<");
 
         algae_raise_motor.set(0.15);
     }
@@ -332,6 +335,22 @@ public class Robot extends TimedRobot
 
     System.out.println("final ALLIANCE : " + robotalliance);
     System.out.println("final ALLIANCE LOCATION : " + alliancelocation);
+
+
+
+    // Ensure sensors are zeroed (like gyro, if needed)
+    
+/* 
+    // Force odometry to update once — initializes m_poseMeters
+    SwerveDrive sd = m_robotContainer.drivebase.getSwerveDrive(); 
+    sd.zeroGyro();
+    sd.updateOdometry(); 
+    // Now it's safe to reset odometry to your desired starting pose
+    sd.resetOdometry(new Pose2d(
+        new Translation2d(0, 0),
+        Rotation2d.fromDegrees(0)
+    ));
+*/
 
 
     m_robotContainer.setMotorBrake(true);
@@ -579,11 +598,11 @@ public class Robot extends TimedRobot
   }
 
   if (operator_controller.getBButton() == true) { // L2 = B BUTTON
-    moveDistance(13); // Move 1 meter
+    moveDistance(14); // Move 1 meter
   }
 
   if (operator_controller.getAButton() == true) { // L3 / TESTING L1 FOR NOW ***********************
-    moveDistance(29); // Move 1 meter
+    moveDistance(30); // Move 1 meter
   }
 
   // Run PID control if we are actively moving to a target

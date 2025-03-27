@@ -7,7 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "path2222"
+            "pathName": "path222999"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "alignright"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "eleraiseL2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "coralshoot"
           }
         }
       ]

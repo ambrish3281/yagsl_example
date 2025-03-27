@@ -45,8 +45,8 @@ public class AutoCoralRaise extends Command {
             double currentPosition = Robot.motor_elevator_one_encoder.getPosition();
             double error = Robot.targetRotations - currentPosition;
 
-            Robot.motor_elevator_one.set(0.3 * Math.signum(error)); // Apply PID output
-            Robot.motor_elevator_two.set(0.3 * Math.signum(error)); // Apply PID output
+            Robot.motor_elevator_one.set(0.25 * Math.signum(error)); // Apply PID output
+            Robot.motor_elevator_two.set(0.25 * Math.signum(error)); // Apply PID output
 
             /* 
             System.out.println("IN CORAL RAISE : currentPosition : " + currentPosition
@@ -60,8 +60,8 @@ public class AutoCoralRaise extends Command {
             {
             System.out.println( " : errorval : " + error + ": currentPosition : " + Robot.motor_elevator_one_encoder.getPosition()) ;
 
-            Robot.motor_elevator_one.set(0.025);
-            Robot.motor_elevator_two.set(0.025);
+            Robot.motor_elevator_one.set(0.02);
+            Robot.motor_elevator_two.set(0.02);
             Robot.movingToTarget = false;
             }
         }
