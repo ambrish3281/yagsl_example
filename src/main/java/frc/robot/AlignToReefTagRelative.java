@@ -1,5 +1,6 @@
 package frc.robot;
 
+import javax.lang.model.util.ElementScanner14;
 import javax.swing.text.Position;
 
 // Copyright (c) FIRST and other WPILib contributors.
@@ -18,15 +19,15 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 public class AlignToReefTagRelative extends Command {
   private PIDController xController, yController, rotController;
-  private boolean isRightScore;
+  private int isRightScore;
   private Timer dontSeeTagTimer, stopTimer;
   private SwerveSubsystem drivebase;
   private double tagID = -1;
 
-  public AlignToReefTagRelative(boolean isRightScore, SwerveSubsystem drivebase) {
-    xController = new PIDController(Constants.X_REEF_ALIGNMENT_P, 0.0, 0);  // Vertical movement
-    yController = new PIDController(Constants.Y_REEF_ALIGNMENT_P, 0.0, 0);  // Horitontal movement
-    rotController = new PIDController(Constants.ROT_REEF_ALIGNMENT_P, 0, 0);  // Rotation
+  public AlignToReefTagRelative(int isRightScore, SwerveSubsystem drivebase) {
+    xController = new PIDController(Constants.X_REEF_ALIGNMENT_P, 0.0, 0.001);  // Vertical movement
+    yController = new PIDController(Constants.Y_REEF_ALIGNMENT_P, 0.0, 0.001);  // Horitontal movement
+    rotController = new PIDController(Constants.ROT_REEF_ALIGNMENT_P, 0, 0.001);  // Rotation
     this.isRightScore = isRightScore;
     this.drivebase = drivebase;
     addRequirements(drivebase);
@@ -50,7 +51,19 @@ public class AlignToReefTagRelative extends Command {
     xController.setSetpoint(Constants.X_SETPOINT_REEF_ALIGNMENT);
     xController.setTolerance(Constants.X_TOLERANCE_REEF_ALIGNMENT);
 
-    yController.setSetpoint(isRightScore ? Constants.Y_SETPOINT_REEF_ALIGNMENT : -Constants.Y_SETPOINT_REEF_ALIGNMENT);
+   // yController.setSetpoint(isRightScore ? Constants.Y_SETPOINT_REEF_ALIGNMENT : -Constants.Y_SETPOINT_REEF_ALIGNMENT);
+
+    if (isRightScore == 1)
+    {
+      yController.setSetpoint(Constants.Y_SETPOINT_REEF_ALIGNMENT);
+    } else if (isRightScore == 0)
+    {
+      yController.setSetpoint(-Constants.Y_SETPOINT_REEF_ALIGNMENT);
+
+    } else {
+      yController.setSetpoint(0);
+    }
+
     yController.setTolerance(Constants.Y_TOLERANCE_REEF_ALIGNMENT);
 
     tagID = LimelightHelpers.getFiducialID("limelight");

@@ -182,8 +182,9 @@ public class RobotContainer {
       //driverXbox.y().whileTrue(new  DriveToTagSimple(drivebase, Robot.lv, 0));
 
       // Reef alignment
-      driverXbox.povRight().onTrue(new AlignToReefTagRelative(true, drivebase).withTimeout(3));
-      driverXbox.povLeft().onTrue(new AlignToReefTagRelative(false, drivebase).withTimeout(3));
+      driverXbox.povRight().onTrue(new AlignToReefTagRelative(1, drivebase).withTimeout(3));
+      driverXbox.povLeft().onTrue(new AlignToReefTagRelative(0, drivebase).withTimeout(3));
+      driverXbox.povUp().onTrue(new AlignToReefTagRelative(2, drivebase).withTimeout(3));
 
 
     }
@@ -211,9 +212,11 @@ public class RobotContainer {
     String autoname ;
     if (Robot.alliancelocation == 1)
     {
+      System.out.println("IN AUTO POSITION 1  <<<<<<<<<<<<<<<<<<<<<<<<<<");
       autoname = "auto19" ;
     } else if (Robot.alliancelocation == 2)
     {
+      System.out.println("IN AUTO POSITION 2  <<<<<<<<<<<<<<<<<<<<<<<<<<");
       autoname = "auto29" ;
     } else if (Robot.alliancelocation == 3)
     {

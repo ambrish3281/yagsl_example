@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -73,8 +74,8 @@ public class Robot extends TimedRobot
   // STUFF FOR ELEVATOR PID CONTROLLER FIXED POSITIONS
   public static RelativeEncoder motor_elevator_one_encoder;
   public static RelativeEncoder motor_elevator_two_encoder;
-  public static PIDController motor_elevator_one_pidc = new PIDController(0.5, 0, 0); // Tune PID values
-  public static PIDController motor_elevator_two_pidc = new PIDController(0.5, 0, 0); // Tune PID values
+  public static PIDController motor_elevator_one_pidc = new PIDController(0.2, 0, 0.001); // Tune PID values
+  public static PIDController motor_elevator_two_pidc = new PIDController(0.2, 0, 0.001); // Tune PID values
   public static double WHEEL_CIRCUMFERENCE = 0.159593026;
   public static double GEAR_RATIO = 40;
   public static double INIT_ENCODER ;
@@ -204,10 +205,25 @@ public class Robot extends TimedRobot
     algae_raise_motor_encoder.setPosition(0.0); // Assume arm is hanging down at boot
 
     // Set up onboard PID constants
-
-
     algae_raise_motor_pidc = algae_raise_motor.getClosedLoopController();
 
+    Timer timeralg = new Timer();
+    timeralg.reset();
+    timeralg.start();
+    
+
+    System.out.println("RAISING ARM START <<<<<<<<<<<<<<<<<<<<<<<");
+    // Run the motor for 2 seconds
+    while (timeralg.get() < 2.0) {
+      System.out.println("RAISING ARM RUNNING <<<<<<<<<<<<<<<<<<<<<<<");
+
+        algae_raise_motor.set(0.15);
+    }
+    
+    // Optionally stop the motor after 2 seconds
+    algae_raise_motor.set(0.04); // feed forward    
+
+    System.out.println("RAISING ARM END <<<<<<<<<<<<<<<<<<<<<<<<<");
     // Left Hand Joystick Port
     // new_joystick = new Joystick(1);
 
@@ -484,9 +500,9 @@ public class Robot extends TimedRobot
     // CORAL SHOOT
     if(rawaxis3 > 0)
     {
-      motor_intake_one.set(0.12);
+      motor_intake_one.set(0.1);
       //motor_intake_one.set(rawaxis3/4);
-          System.out.println("shoot speed : " + 0.19);
+          System.out.println("shoot speed : " + 0.1);
 
     }
 
@@ -576,12 +592,20 @@ public class Robot extends TimedRobot
   {
     double currentPosition = motor_elevator_one_encoder.getPosition();
     double error = targetRotations - currentPosition;
-    double pidOutput = motor_elevator_one_pidc.calculate(currentPosition, targetRotations);
+    double rawpidoutput = motor_elevator_one_pidc.calculate(currentPosition, targetRotations) ;
+    //double pidOutput =  MathUtil.clamp(rawpidoutput,-0.15,0.25);
+    double pidOutput = scale(rawpidoutput,-1,1,-0.15,0.25);
+    System.out.println("RAW PID : " + rawpidoutput + " : CLAMPED : " + pidOutput);
+    //motor_elevator_two.set(pidOutput);
+    //motor_elevator_one.set(pidOutput);
 
+
+    
     if(Math.signum(error) > 0) // UP SPEED SET
     {
       motor_elevator_two.set(0.25); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
       motor_elevator_one.set(0.25); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      
       //System.out.println("ELE SPEED GOIN UP: " + motor_elevator_one.get());
 
     }else                       // DOWN SPEED SET
@@ -591,6 +615,8 @@ public class Robot extends TimedRobot
       //System.out.println("ELE SPEED GOIN DOWN : " + motor_elevator_one.get());
 
     }
+      
+      
 
     //motor_elevator_one.set(0.3 * Math.signum(error)); // Apply PID output
     //motor_elevator_two.set(0.3 * Math.signum(error)); // Apply PID output
@@ -649,6 +675,10 @@ public class Robot extends TimedRobot
     System.out.println( " : CURRENT POSITION : " + motor_elevator_one_encoder.getPosition());
     System.out.println( " : ERRORVAL  : " + (targetRotations - motor_elevator_one_encoder.getPosition()));
 }
+
+  public double scale(double value, double inMin, double inMax, double outMin, double outMax) {
+    return (value - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+  }
     
     
 
