@@ -355,6 +355,7 @@ public class Robot extends TimedRobot
 
     m_robotContainer.setMotorBrake(true);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    System.out.println(">>>>>>>>>>>>>>>>>> IN AUTO :" + m_autonomousCommand.getName());
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null)
@@ -455,19 +456,19 @@ public class Robot extends TimedRobot
 
     // ALGAE
 
-    System.out.println("ALGAE SPIN ROTATIONS : " + algae_spin_motor.getEncoder().getPosition());
-    System.out.println("ALGAE ARM ROTATIONS : " + algae_raise_motor.getEncoder().getPosition());
+  //  System.out.println("ALGAE SPIN ROTATIONS : " + algae_spin_motor.getEncoder().getPosition());
+   // System.out.println("ALGAE ARM ROTATIONS : " + algae_raise_motor.getEncoder().getPosition());
 
-    System.out.println("opPOV : " + opPOV);
+   // System.out.println("opPOV : " + opPOV);
 
 
     if (leftbumperbutton)
     {
-      System.out.println("PRESSED LEFT bumper ");
+      //System.out.println("PRESSED LEFT bumper ");
       algae_spin_motor.set(0.2);
     }else if (rightbumperbutton)
     {
-      System.out.println("PRESSED RIGHT bumper ");
+      //System.out.println("PRESSED RIGHT bumper ");
       algae_spin_motor.set(-0.2);
     }else 
     {
@@ -477,15 +478,15 @@ public class Robot extends TimedRobot
 
     if (rawaxis5 > 0.05)
     {
-      System.out.println("PRESSED RIGHT JOYST POSITIVE ");
+      //System.out.println("PRESSED RIGHT JOYST POSITIVE ");
       algae_raise_motor.set(-0.02);
     }else if (rawaxis5 < -0.05) // UP
     {
-      System.out.println("PRESSED RIGHT JOYST NEGETIVE ");
+      //System.out.println("PRESSED RIGHT JOYST NEGETIVE ");
       algae_raise_motor.set(0.15);
     }else 
     {
-      System.out.println("ALGAE ARM STOP ");
+      //System.out.println("ALGAE ARM STOP ");
       algae_raise_motor.set(0.04); // MIGHT NEED FEED FORWARD
     }
 
@@ -505,7 +506,7 @@ public class Robot extends TimedRobot
     {
       if(rawaxis2 > 0)
       {
-      motor_intake_one.set(0.12);
+      motor_intake_one.set(0.2);
       }else
       {
               motor_intake_one.set(0);
@@ -519,11 +520,11 @@ public class Robot extends TimedRobot
     // CORAL SHOOT
     if(rawaxis3 > 0)
     {
-      motor_intake_one.set(0.1);
+      motor_intake_one.set(0.22);
       //motor_intake_one.set(rawaxis3/4);
-          System.out.println("shoot speed : " + 0.1);
+         // System.out.println("shoot speed : " + 0.1);
 
-    }
+    } 
 
     /* 
     if (rightbumperbutton)
@@ -598,7 +599,7 @@ public class Robot extends TimedRobot
   }
 
   if (operator_controller.getBButton() == true) { // L2 = B BUTTON
-    moveDistance(14); // Move 1 meter
+    moveDistance(15); // Move 1 meter
   }
 
   if (operator_controller.getAButton() == true) { // L3 / TESTING L1 FOR NOW ***********************
@@ -614,7 +615,7 @@ public class Robot extends TimedRobot
     double rawpidoutput = motor_elevator_one_pidc.calculate(currentPosition, targetRotations) ;
     //double pidOutput =  MathUtil.clamp(rawpidoutput,-0.15,0.25);
     double pidOutput = scale(rawpidoutput,-1,1,-0.15,0.25);
-    System.out.println("RAW PID : " + rawpidoutput + " : CLAMPED : " + pidOutput);
+    //System.out.println("RAW PID : " + rawpidoutput + " : CLAMPED : " + pidOutput);
     //motor_elevator_two.set(pidOutput);
     //motor_elevator_one.set(pidOutput);
 
@@ -629,8 +630,8 @@ public class Robot extends TimedRobot
 
     }else                       // DOWN SPEED SET
     {
-      motor_elevator_two.set(-0.15); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-      motor_elevator_one.set(-0.15); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_two.set(-0.2); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
+      motor_elevator_one.set(-0.2); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
       //System.out.println("ELE SPEED GOIN DOWN : " + motor_elevator_one.get());
 
     }
@@ -654,6 +655,7 @@ public class Robot extends TimedRobot
     + " : pidOutput : " + pidOutput
     + ": error :" + error);
     */
+    
 
 
     // Stop if close enough OR if the PID output changes direction (prevents overshoot)

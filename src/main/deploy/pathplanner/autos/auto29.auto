@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "path222999"
+            "pathName": "path2229993"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "alignright"
+            "name": "aligncenter"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "eleraiseL2"
+            "name": "eleraiseL1"
           }
         },
         {

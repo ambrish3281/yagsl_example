@@ -23,13 +23,13 @@ public final class Constants
   // APRIL TAG CONSTANTS
 
   // Auto constants
-	public static final double X_REEF_ALIGNMENT_P = 2;
-	public static final double Y_REEF_ALIGNMENT_P = 2;
-	public static final double ROT_REEF_ALIGNMENT_P = 0.058;
+	public static final double X_REEF_ALIGNMENT_P = 2.5;
+	public static final double Y_REEF_ALIGNMENT_P = 2.5;
+	public static final double ROT_REEF_ALIGNMENT_P = 0;
 
 	public static final double ROT_SETPOINT_REEF_ALIGNMENT = 0;  // Rotation
 	public static final double ROT_TOLERANCE_REEF_ALIGNMENT = 1;
-	public static final double X_SETPOINT_REEF_ALIGNMENT = -0.1;  // Vertical pose
+	public static final double X_SETPOINT_REEF_ALIGNMENT = -0.07;  // Vertical pose
 	public static final double X_TOLERANCE_REEF_ALIGNMENT = 0.02;
 	public static final double Y_SETPOINT_REEF_ALIGNMENT = 0.16;  // Horizontal pose
 	public static final double Y_TOLERANCE_REEF_ALIGNMENT = 0.02;
@@ -44,7 +44,7 @@ public final class Constants
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
   //changing for now to 3.5 from 14.5: Vihaan
-  public static final double MAX_SPEED  = Units.feetToMeters(6.75);
+  public static final double MAX_SPEED  = Units.feetToMeters(10);
   // Maximum speed of the robot in meters per second, used to limit acceleration.
 
 //  public static final class AutonConstants

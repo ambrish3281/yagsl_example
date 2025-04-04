@@ -129,7 +129,7 @@ public class RobotContainer {
     //named command
     NamedCommands.registerCommand("test", Commands.print("Hello World"));
     NamedCommands.registerCommand("eleraiseL1", new AutoCoralRaise(6));
-        NamedCommands.registerCommand("eleraiseL2", new AutoCoralRaise(14));
+        NamedCommands.registerCommand("eleraiseL2", new AutoCoralRaise(15));
     NamedCommands.registerCommand("eleraiseL3", new AutoCoralRaise(30));
 
     NamedCommands.registerCommand("coralshoot", new AutoCoralShoot());
@@ -181,7 +181,7 @@ public class RobotContainer {
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+      //driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.b().whileTrue(
           drivebase.driveToPose(
@@ -244,6 +244,7 @@ public class RobotContainer {
    // autoname = "testauto1";
     // ******************** TEST ONLY REMOVE LATER
 
+      autoname = "auto39" ; // *********************** hardcoded *****************************
 
     System.out.println("AUTO NAME : " + autoname);
     return drivebase.getAutonomousCommand(autoname);

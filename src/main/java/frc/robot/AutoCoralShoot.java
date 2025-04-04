@@ -34,12 +34,12 @@ public class AutoCoralShoot extends Command {
 
     @Override
     public void execute() {
-       System.out.println("IN CORAL SHOOT");
+      // System.out.println("IN CORAL SHOOT");
     }
 
     @Override
     public boolean isFinished() {
-        return timer.hasElapsed(4);
+        return timer.hasElapsed(7);
     }
 
     @Override
