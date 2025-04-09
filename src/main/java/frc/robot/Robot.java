@@ -506,7 +506,7 @@ public class Robot extends TimedRobot
     {
       if(rawaxis2 > 0)
       {
-      motor_intake_one.set(0.2);
+      motor_intake_one.set(0.2); // CORAL INTAKE SPEED
       }else
       {
               motor_intake_one.set(0);
@@ -520,7 +520,7 @@ public class Robot extends TimedRobot
     // CORAL SHOOT
     if(rawaxis3 > 0)
     {
-      motor_intake_one.set(0.22);
+      motor_intake_one.set(0.28); // CORAL SHOOT SPEED
       //motor_intake_one.set(rawaxis3/4);
          // System.out.println("shoot speed : " + 0.1);
 
@@ -603,7 +603,7 @@ public class Robot extends TimedRobot
   }
 
   if (operator_controller.getAButton() == true) { // L3 / TESTING L1 FOR NOW ***********************
-    moveDistance(30); // Move 1 meter
+    moveDistance(31); // Move 1 meter
   }
 
   // Run PID control if we are actively moving to a target
@@ -614,7 +614,8 @@ public class Robot extends TimedRobot
     double error = targetRotations - currentPosition;
     double rawpidoutput = motor_elevator_one_pidc.calculate(currentPosition, targetRotations) ;
     //double pidOutput =  MathUtil.clamp(rawpidoutput,-0.15,0.25);
-    double pidOutput = scale(rawpidoutput,-1,1,-0.15,0.25);
+
+    double pidOutput = scale(rawpidoutput,-1,1,-0.15,0.3);
     //System.out.println("RAW PID : " + rawpidoutput + " : CLAMPED : " + pidOutput);
     //motor_elevator_two.set(pidOutput);
     //motor_elevator_one.set(pidOutput);
@@ -625,7 +626,7 @@ public class Robot extends TimedRobot
     {
       motor_elevator_two.set(0.25); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
       motor_elevator_one.set(0.25); // NO NEGETIVE NEEDED FOR ONE MOTOR DUE TO DESIGN
-      
+
       //System.out.println("ELE SPEED GOIN UP: " + motor_elevator_one.get());
 
     }else                       // DOWN SPEED SET

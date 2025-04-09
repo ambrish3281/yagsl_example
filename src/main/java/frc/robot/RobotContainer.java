@@ -244,7 +244,10 @@ public class RobotContainer {
    // autoname = "testauto1";
     // ******************** TEST ONLY REMOVE LATER
 
-      autoname = "auto39" ; // *********************** hardcoded *****************************
+      // POSITION 1 LEFT - set auto19
+      // POSITION 2 MIDDLE - set auto29
+      // POSITION 3 RIGHT - set auto39
+      autoname = "auto39" ; // *********************** VIHAAN VIN UPDATE *****************************
 
     System.out.println("AUTO NAME : " + autoname);
     return drivebase.getAutonomousCommand(autoname);

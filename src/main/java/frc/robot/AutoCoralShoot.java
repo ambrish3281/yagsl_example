@@ -29,7 +29,7 @@ public class AutoCoralShoot extends Command {
     public void initialize() {
         timer.reset();
         timer.start();
-        Robot.motor_intake_one.set(0.1111);
+        Robot.motor_intake_one.set(0.28);
     }
 
     @Override
